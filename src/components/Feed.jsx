@@ -1,13 +1,29 @@
 import { Box, Stack, Typography } from '@mui/material'
+import { useState, useEffect } from 'react';
 import React from 'react'
-import {SideBar, Videos} from './'
+import {SideBar, Videos} from './';
+import { fetchFromAPI } from '../utils/fetchFromAPI';
 
 
 const Feed = () => {
+
+  const [selectedCategory, setSelectedCategory] = useState('New');
+  const [videos, setVideos] = useState([])
+
+  useEffect(() => {
+    // we need to fetch data whenever the page is relaod.s
+    // the code inside it will run whenever the page is reloaded.
+    fetchFromAPI(`search?part=snippet&q=${selectedCategory}`)
+      .then((data) => setVideos(data.items))
+  }, [selectedCategory]);
+
   return (
     <Stack sx={{flexDirection:{sx : "column", md: "row"}}}>
       <Box sx={{height: { sx: 'auto', md: '92vh'}, borderRight: '1px solid #3d3d3d', px: {sx:0, md: 2}}}>
-        <SideBar/>
+        <SideBar
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
 
         <Typography className='copyright' variant='body2' sx={{mt : 1.5, color: '#fff'}}>
           Copyright 2023 DVD
@@ -18,10 +34,10 @@ const Feed = () => {
         <Typography variant='h4'
         fontWeight="bold"
         mb={2} sx={{color : 'white'}}>
-          New <span style={{color: '#F31503'}}>videos</span>
+          {selectedCategory} <span style={{color: '#F31503'}}>videos</span>
         </Typography>
 
-        <Videos videos={[]} />
+        <Videos videos={videos} />
       </Box>
 
     </Stack>
